@@ -1,19 +1,16 @@
-use std::print;
+use std::{cmp::min, print};
+
+use testers::Algorithm;
 
 mod helpers;
 mod kk;
 mod signs;
+mod testers;
 
 fn main() {
-    let len = 4;
-    let partition = kk::gen_partition(len);
-    for val in &partition {
-        println!("{}", val);
-    }
-    let mut a = Vec::new();
-    for _i in 0..len {
-        a.push(1);
-    }
-    println!("{}", kk::evaluate(&a, &partition));
     println!("Hello, world!");
+    let (resultRand, resultClimb, resultAnneal) = testers::run_partition_tests(5, 100, 25000);
+    println!("{}, {}, {}", resultRand, resultClimb, resultAnneal);
+    println!("Winner: {}", resultRand.min(resultClimb).min(resultAnneal));
+    println!("Loser: {}", resultRand.max(resultClimb).max(resultAnneal));
 }

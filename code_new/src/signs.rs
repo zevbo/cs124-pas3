@@ -12,7 +12,7 @@ pub fn gen_signs(len: usize) -> SignsT {
     return v;
 }
 
-pub fn evaluate(a: Vec<usize>, signs: SignsT) -> i32 {
+pub fn evaluate(a: helpers::A, signs: SignsT) -> i32 {
     let zipped = a.iter().zip(signs.iter());
     let mut sum = 0;
     for (val, sign) in zipped {
