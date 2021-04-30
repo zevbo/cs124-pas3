@@ -16,7 +16,7 @@ pub fn gen_a(len: usize) -> A {
     let mut rng = rand::thread_rng();
     let mut v = Vec::new();
     for _ in 0..len {
-        v.push(rng.gen::<i64>() % max_num);
+        v.push(rng.gen::<i64>().abs() % max_num);
     }
     return v;
 }

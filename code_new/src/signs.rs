@@ -1,4 +1,4 @@
-type SignsT = Vec<bool>;
+pub type SignsT = Vec<bool>;
 
 use crate::helpers;
 use rand::Rng;
@@ -12,16 +12,16 @@ pub fn gen_signs(len: usize) -> SignsT {
     return v;
 }
 
-pub fn evaluate(a: helpers::A, signs: SignsT) -> i32 {
+pub fn evaluate(a: &helpers::A, signs: &SignsT) -> i64 {
     let zipped = a.iter().zip(signs.iter());
     let mut sum = 0;
     for (val, sign) in zipped {
-        sum += (*val as i32) * (if *sign { 1 } else { -1 });
+        sum += (*val as i64) * (if *sign { 1 } else { -1 });
     }
-    return sum;
+    return sum.abs();
 }
 
-fn rand_edit(signs: &SignsT) -> SignsT {
+pub fn rand_edit(signs: &SignsT) -> SignsT {
     let mut new_signs = SignsT::clone(signs);
     let mut rng = rand::thread_rng();
     let (ind1, ind2) = helpers::gen_unequal(signs.len());
