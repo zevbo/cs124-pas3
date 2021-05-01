@@ -21,7 +21,7 @@ pub fn evaluate(a: &helpers::A, signs: &SignsT) -> i64 {
     return sum.abs();
 }
 
-pub fn rand_edit(signs: &SignsT) -> SignsT {
+pub fn rand_edit(signs: &SignsT, _signs: i64) -> SignsT {
     let mut new_signs = SignsT::clone(signs);
     let mut rng = rand::thread_rng();
     let (ind1, ind2) = helpers::gen_unequal(signs.len());

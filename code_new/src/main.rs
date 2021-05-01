@@ -11,7 +11,7 @@ mod testers;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    if (true) {
+    if (false) {
         let mut a = helpers::A::new();
         let filename = args.get(2).unwrap();
         let algorithim = args.get(1).unwrap();
@@ -44,16 +44,12 @@ fn main() {
         }
     } else {
         println!("Hello, world!");
-        let v = vec![1, 2, 2, 4, 0];
-        for i in kk::rand_edit(&kk::rand_edit(&v)) {
-            print!("{}, ", i);
-        }
         let a = vec![10, 8, 7, 6, 5];
         assert!(kk::kk_evaluate(&a) == 2);
         let mut iters_to_track = HashSet::new();
         iters_to_track.insert(25000 - 1);
         let mut reworked_results: Vec<Vec<f64>> = vec![Vec::new(), Vec::new(), Vec::new()];
-        let all_data_hash = testers::run_tests(100, 100, 25000, iters_to_track, true);
+        let all_data_hash = testers::run_tests(50, 100, 25000, iters_to_track, true);
         type data = (i64, (Summary, Summary, Summary));
         fn print_summary(summ: &Summary) {
             println!("\nSummary:");
@@ -65,11 +61,12 @@ fn main() {
             println!("{}", summ.max);
         }
 
-        let (rand_summary, climb_summary, anneal_summary) =
+        let (rand_summary, climb_summary, anneal_summary, super_man_summary) =
             all_data_hash.get(&(25000 - 1)).unwrap();
         print_summary(rand_summary);
         print_summary(climb_summary);
         print_summary(anneal_summary);
+        print_summary(super_man_summary);
 
         /*
         let (rand_summary, climb_summary, anneal_summary) =

@@ -54,10 +54,10 @@ pub fn gen_partition(len: usize) -> PartitionT {
     return v;
 }
 
-pub fn rand_edit(partition: &PartitionT) -> PartitionT {
+pub fn rand_edit(partition: &PartitionT, size: i64) -> PartitionT {
     let mut new_partition = PartitionT::clone(partition);
     let mut rng = rand::thread_rng();
-    for _ in 0..3 {
+    for _ in 0..size {
         let ind = rng.gen::<usize>() % partition.len();
         let mut new_group = new_partition[ind];
         while new_group == new_partition[ind] {

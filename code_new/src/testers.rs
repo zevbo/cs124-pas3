@@ -1,6 +1,7 @@
 use core::num;
 use rand::distributions::{Distribution, Uniform};
 use std::{
+    cmp::{max, min},
     collections::{binary_heap::Iter, HashMap, HashSet},
     fmt::Display,
     iter::Sum,
@@ -16,6 +17,7 @@ pub enum Algorithm {
     Random,
     Climbing,
     Annealing,
+    SuperMan,
 }
 
 fn t(prev_result: f64, multiplier: f64) -> f64 {
@@ -36,7 +38,7 @@ fn general_test<T: IntoIterator>(
     algo: Algorithm,
     gen: fn(usize) -> T,
     eval: fn(&helpers::A, &T) -> i64,
-    rand_edit: fn(&T) -> T,
+    rand_edit: fn(&T, i64) -> T,
 ) -> HashMap<i64, i64>
 where
     T::Item: Display,
@@ -56,27 +58,70 @@ where
         tracked_results.insert(0, last_residue);
     }
 
+    let mut side_vel = 0.;
+    let side_vel_expected = 0.1;
+    let mut down_vel = 0.;
+    let expected_down_vel = 0.3 / 20.;
+    let trailing = 0.99;
+    let normalizing_constant = 1. - trailing;
+    let min_vel = 0.000001;
+    let min_down_vel = 0.00000001;
+
     for i in 1..max_iter {
+        if side_vel < min_vel {
+            side_vel = min_vel;
+        }
+        if down_vel < min_down_vel {
+            down_vel = min_down_vel;
+        }
+        let super_man_edit_size = min(
+            if i == 1 {
+                1
+            } else {
+                (1.0 + expected_down_vel / (normalizing_constant * down_vel)) as i64
+            },
+            20,
+        );
+        match algo {
+            Algorithm::SuperMan => {
+                if i % 5000 == 0 {
+                    println!("{}: {}, {}, {}", i, super_man_edit_size, side_vel, down_vel);
+                }
+            }
+            _ => (),
+        }
         let new_starting = match algo {
             Algorithm::Random => gen(a.len()),
-            Algorithm::Climbing | Algorithm::Annealing => rand_edit(&starting),
+            Algorithm::Climbing | Algorithm::Annealing => rand_edit(&starting, 1),
+            Algorithm::SuperMan => rand_edit(&starting, super_man_edit_size),
         };
+        fn max(f1: f64, f2: f64) -> f64 {
+            if f1 > f2 {
+                return f1;
+            } else {
+                return f2;
+            }
+        }
         let new_residue = eval(&a, &new_starting);
         prev_result = t(prev_result, multiplier);
         let use_new = new_residue <= last_residue
             || match algo {
-                Algorithm::Annealing => {
+                Algorithm::Annealing | Algorithm::SuperMan => {
                     distribution.sample(&mut rng)
                         < threshold(last_residue, new_residue, prev_result)
                 }
                 _ => false,
             };
+        side_vel *= trailing;
         if use_new {
+            down_vel =
+                down_vel * trailing + (last_residue as f64).log10() - (new_residue as f64).log10();
             starting = new_starting;
-            last_residue = new_residue
+            last_residue = new_residue;
+            side_vel += super_man_edit_size as f64; //super_man_edit_size as f64;
         }
         match algo {
-            Algorithm::Annealing => {
+            Algorithm::Annealing | Algorithm::SuperMan => {
                 if last_residue < annealing_residue {
                     annealing_residue = last_residue;
                 }
@@ -85,7 +130,7 @@ where
         }
         if iters_to_track.contains(&i) {
             let residue = match algo {
-                Algorithm::Annealing => annealing_residue,
+                Algorithm::Annealing | Algorithm::SuperMan => annealing_residue,
                 _ => last_residue,
             };
             tracked_results.insert(i, residue);
@@ -153,9 +198,14 @@ pub fn run_tests(
     max_iter: i64,
     iters_to_track: HashSet<i64>,
     use_partitions: bool,
-) -> HashMap<i64, (Summary, Summary, Summary)> {
+) -> HashMap<i64, (Summary, Summary, Summary, Summary)> {
     let mut all_results = HashMap::new();
-    let algorithims = vec![Algorithm::Random, Algorithm::Climbing, Algorithm::Annealing];
+    let algorithims = vec![
+        Algorithm::Random,
+        Algorithm::Climbing,
+        Algorithm::Annealing,
+        Algorithm::SuperMan,
+    ];
     for algorithm in algorithims {
         all_results.insert(algorithm, Vec::<HashMap<i64, i64>>::new());
     }
@@ -201,6 +251,7 @@ pub fn run_tests(
                 *summaries.get(&Algorithm::Random).unwrap(),
                 *summaries.get(&Algorithm::Climbing).unwrap(),
                 *summaries.get(&Algorithm::Annealing).unwrap(),
+                *summaries.get(&Algorithm::SuperMan).unwrap(),
             ),
         );
     }
