@@ -13,35 +13,13 @@ fn main() {
     let args: Vec<String> = env::args().collect();
     if (true) {
         let mut a = helpers::A::new();
-        let filename = args.get(2).unwrap();
-        let algorithim = args.get(1).unwrap();
+        let filename = args.get(1).unwrap();
         let contents = fs::read_to_string(filename).expect("Something went wrong reading the file");
         let lines = contents.split("\n");
         for num in lines.into_iter() {
             a.push((*num).parse().unwrap());
         }
-        println!("algo: {}", algorithim);
-        if algorithim == "0" {
-            println!("{}", kk::kk_evaluate(&a));
-        } else {
-            let use_partitions = algorithim == "11" || algorithim == "12" || algorithim == "13";
-            let algorithm = if algorithim == "1" || algorithim == "11" {
-                testers::Algorithm::Random
-            } else if algorithim == "2" || algorithim == "12" {
-                testers::Algorithm::Climbing
-            } else {
-                testers::Algorithm::Annealing
-            };
-            let test_f = if use_partitions {
-                testers::partition_test
-            } else {
-                testers::signs_test
-            };
-            let mut iters_to_check = HashSet::new();
-            iters_to_check.insert(25000 - 1);
-            let all_data_hash = test_f(&a, 25000, &iters_to_check, algorithm);
-            println!("{}", all_data_hash.get(&24999).unwrap());
-        }
+        println!("{}", kk::kk_evaluate(&a));
     } else {
         println!("Hello, world!");
         let v = vec![1, 2, 2, 4, 0];
