@@ -61,7 +61,7 @@ where
     let mut side_vel = 0.;
     let side_vel_expected = 0.1;
     let mut down_vel = 0.;
-    let expected_down_vel = 0.3 / 20.;
+    let expected_down_vel = 0.3 / 40.;
     let trailing = 0.99;
     let normalizing_constant = 1. - trailing;
     let min_vel = 0.000001;
